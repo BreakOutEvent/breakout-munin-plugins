@@ -5,15 +5,16 @@ case $1 in
         cat <<'EOM'
 graph_title BreakOut Stats
 graph_vlabel stats
-graph_order mysql4 mysql3 mysql2 mysql1 mysql0
+graph_args -l 0
+graph_order mysql0 mysql1 mysql2 mysql3 mysql4
 mysql0.label nutzer
-mysql0.draw STACK
+mysql0.draw AREA
 mysql1.label teilnehmer
-mysql1.draw STACK
+mysql1.draw AREA
 mysql2.label teams
-mysql2.draw STACK
+mysql2.draw AREA
 mysql3.label teams_munich
-mysql3.draw STACK
+mysql3.draw AREA
 mysql4.label teams_berlin
 mysql4.draw AREA
 EOM
