@@ -1,0 +1,29 @@
+#!/bin/bash
+
+case $1 in
+   config)
+        cat <<'EOM'
+graph_title BreakOut Stats
+graph_vlabel stats
+graph_order mysql4 mysql3 mysql2 mysql1 mysql0
+mysql0.label nutzer
+mysql0.draw STACK
+mysql1.label teilnehmer
+mysql1.draw STACK
+mysql2.label teams
+mysql2.draw STACK
+mysql3.label teams_munich
+mysql3.draw STACK
+mysql4.label teams_berlin
+mysql4.draw AREA
+EOM
+        exit 0;;
+esac
+
+results=($(mysql -u readonly -Bse "SELECT * FROM (SELECT COUNT(*) as nutzer FROM  backend.user_core) as nutzer, (SELECT COUNT(*) as teilnehmer FROM  backend.user_role WHERE role_name = 'PARTICIPANT') as teilnehmer, (SELECT COUNT(*) as teams FROM  backend.team) as teams, (SELECT COUNT(*) as teams_munich FROM  backend.team WHERE event_id=2) as teams_munich, (SELECT COUNT(*) as teams_berlin FROM  backend.team WHERE event_id=1) as teams_berlin"))
+
+cnt=${#results[@]}
+for (( i=0 ; i<cnt ; i++ ))
+do
+    echo "mysql${i}.value ${results[$i]}"
+done
