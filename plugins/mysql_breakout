@@ -7,17 +7,19 @@ graph_title BreakOut Stats
 graph_vlabel stats
 graph_args -l 0
 graph_printf %6.0lf
-graph_order mysql0 mysql1 mysql2 mysql3 mysql4
+graph_order mysql0 mysql1 mysql2 mysql3 mysql4 mysql5 mysql6
 mysql0.label nutzer
 mysql1.label teilnehmer
 mysql2.label teams
 mysql3.label teams_munich
-mysql4.label teams_berlin
+mysql4.label full_teams_munich
+mysql5.label teams_berlin
+mysql6.label full_teams_berlin
 EOM
         exit 0;;
 esac
 
-results=($(mysql -u readonly -Bse "SELECT * FROM (SELECT COUNT(*) as nutzer FROM  backend.user_core) as nutzer, (SELECT COUNT(*) as teilnehmer FROM  backend.user_role WHERE role_name = 'PARTICIPANT') as teilnehmer, (SELECT COUNT(*) as teams FROM  backend.team) as teams, (SELECT COUNT(*) as teams_munich FROM  backend.team WHERE event_id=2) as teams_munich, (SELECT COUNT(*) as teams_berlin FROM  backend.team WHERE event_id=1) as teams_berlin"))
+results=($(mysql -u readonly -Bse "SELECT * FROM (SELECT COUNT(*) as nutzer FROM backend_production.user_core) as nutzer, (SELECT COUNT(*) as teilnehmer FROM backend_production.user_role WHERE role_name = 'PARTICIPANT') as teilnehmer, (SELECT COUNT(*) as teams FROM  backend_production.team) as teams, (SELECT COUNT(*) as teams_munich FROM  backend_production.team WHERE event_id=2) as teams_munich, (SELECT COUNT(*) as full_teams_munich FROM (SELECT t.id FROM backend_production.team t LEFT JOIN backend_production.user_role r ON t.id = r.current_team_id WHERE t.event_id = 2 GROUP BY current_team_id HAVING COUNT(*) > 1) as ftb) as full_teams_munich, (SELECT COUNT(*) as teams_berlin FROM backend_production.team WHERE event_id=1) as teams_berlin, (SELECT COUNT(*) as full_teams_berlin FROM (SELECT t.id FROM backend_production.team t LEFT JOIN backend_production.user_role r ON t.id = r.current_team_id WHERE t.event_id = 1 GROUP BY current_team_id HAVING COUNT(*) > 1) as ftb) as full_teams_berlin"))
 
 cnt=${#results[@]}
 for (( i=0 ; i<cnt ; i++ ))
